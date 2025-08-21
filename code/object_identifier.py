@@ -12,31 +12,19 @@ class ObjectIdentifier:
             (36, 37, 44, 45): 10,
             (64, 65, 72, 73): 17,
             (4, 5, 12, 13): 20,
-            
-            # Add the missing object patterns here
-            # You need to find what 2x2 patterns correspond to objects 14, 15, 16, and 19
-            # Look at your CSV file to see what tile IDs make up these objects
-            # For example (these are placeholders - replace with actual patterns):
-            # (6, 7, 14, 15): 14,    # Object 14 pattern
-            # (22, 23, 30, 31): 15,  # Object 15 pattern  
-            # (38, 39, 46, 47): 16,  # Object 16 pattern
-            # (50, 51, 58, 59): 19,  # Object 19 pattern
+            (6, 7, 14, 15): 15,
         }
         
         # Track processed positions to avoid duplicates
         self.processed_positions = set()
-    
+        
     def get_object_at_position(self, layout, row, col):
         """
         Check if there's a 2x2 object pattern starting at the given position.
         Returns (object_index, positions_to_mark) or (None, None) if no pattern found.
         """
-        # Skip if this position was already processed
-        if (row, col) in self.processed_positions:
-            return None, None
-            
-        # Skip if this isn't a valid starting position
-        if layout[row][col] == '-1':
+        # Skip if this position was already processed or is empty
+        if (row, col) in self.processed_positions or layout[row][col] == '-1':
             return None, None
             
         try:
@@ -49,10 +37,6 @@ class ObjectIdentifier:
                                                             layout[row + 1][col + 1] != '-1') else -1
             
             pattern = (top_left, top_right, bottom_left, bottom_right)
-            
-            # Debug: Print patterns that don't match anything
-            if pattern not in self.multi_tile_objects and top_left != -1 and top_right != -1 and bottom_left != -1 and bottom_right != -1:
-                print(f"UNMATCHED PATTERN: {pattern} at row {row}, col {col}")
             
             # Check if this pattern matches any known objects
             if pattern in self.multi_tile_objects:
@@ -85,9 +69,5 @@ class ObjectIdentifier:
         self.processed_positions.clear()
     
     def add_pattern(self, pattern, object_index):
-        """Add a new 2x2 pattern mapping (useful for extending the mapper)."""
+        """Add a new 2x2 pattern mapping."""
         self.multi_tile_objects[pattern] = object_index
-    
-    def get_all_patterns(self):
-        """Get all registered patterns (for debugging)."""
-        return self.multi_tile_objects.copy()

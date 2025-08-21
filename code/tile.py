@@ -9,17 +9,19 @@ class Tile(pygame.sprite.Sprite):
         self.image = surface
         self.rect = self.image.get_rect(topleft = pos)
 
-        # Adjust hitbox based on sprite type
+        # Simple hitbox adjustment based on sprite type
         if sprite_type == 'object':
-            # For objects, use a more conservative hitbox that accounts for the actual image size
-            # and provides better collision detection
-            self.hitbox = self.rect.inflate(-10, -20)  # Slightly smaller than the full object
+            # Objects get a slightly smaller hitbox for better visual overlap
+            self.hitbox = self.rect.inflate(-5, -10)
         elif sprite_type == 'grass':
-            # Grass should have a smaller hitbox so player can appear slightly behind it
-            self.hitbox = self.rect.inflate(0, -10)
-        elif sprite_type == 'invisible':
-            # Boundary tiles use the full rect for collision
-            self.hitbox = self.rect
+            # Grass gets a small reduction so player can appear behind it
+            self.hitbox = self.rect.inflate(0, -5)
         else:
-            # Default hitbox
-            self.hitbox = self.rect.inflate(0, -10)
+            # Boundaries and default use full rect
+            self.hitbox = self.rect.copy()
+
+    def debug_draw(self, surface, offset):
+        """Debug method to visualize hitboxes"""
+        hitbox_rect = pygame.Rect(self.hitbox.x - offset.x, self.hitbox.y - offset.y, 
+                                 self.hitbox.width, self.hitbox.height)
+        pygame.draw.rect(surface, 'red', hitbox_rect, 2)
