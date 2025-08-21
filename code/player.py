@@ -3,7 +3,7 @@ from settings import *
 from support import import_folder
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, groups, obstacle_sprites, create_attack, destroy_attack):
+    def __init__(self, pos, groups, obstacle_sprites, create_attack, destroy_attack, create_magic):
         
         super().__init__(groups)
         self.image = pygame.image.load('./graphics/player.png').convert_alpha()
@@ -19,7 +19,6 @@ class Player(pygame.sprite.Sprite):
 
         # Movement
         self.direction = pygame.math.Vector2()
-        self.speed = 5
         self.obstacle_sprites = obstacle_sprites
         
 
@@ -28,6 +27,26 @@ class Player(pygame.sprite.Sprite):
         self.destroy_attack = destroy_attack
         self.weapon_index = 0
         self.weapon = list(weapon_data.keys())[self.weapon_index]
+        self.can_switch_weapon = True
+        self.weapon_switch_time = None
+        self.switch_delay = 200
+
+        #magic
+        self.create_magic = create_magic
+        self.magic_index = 0
+        self.magic_list = list(magic_data.keys())        
+        self.magic = self.magic_list[self.magic_index]
+        self.can_switch_magic = True
+        self.magic_switch_time = None
+        self.switch_delay = 200
+
+        #stats
+        self.stats = {'health': 100, 'energy': 60, 'attack': 10, 'magic_multiplier': 3, 'speed': 5}
+        self.health = self.stats['health']
+        self.energy = self.stats['energy']
+        self.exp = 123
+        self.speed = self.stats['speed']
+
         
         # Simplified ability cooldowns
         self.ability_cooldowns = {
@@ -102,15 +121,45 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE]:
             if self.use_ability('attack'):
                 self.create_attack()
-        elif keys[pygame.K_1]:
-            self.use_ability('magic1')
-        elif keys[pygame.K_2]:
-            self.use_ability('magic2')
-        elif keys[pygame.K_3]:
-            self.use_ability('magic3')
-        elif keys[pygame.K_4]:
-            self.use_ability('magic4')
-            
+        elif keys[pygame.K_1] or keys[pygame.K_2] or keys[pygame.K_3] or keys[pygame.K_4]:
+            # map number keys to magic index 0..3
+            target_index = None
+            if keys[pygame.K_1]:
+                target_index = 0
+            elif keys[pygame.K_2]:
+                target_index = 1
+            elif keys[pygame.K_3]:
+                target_index = 2
+            elif keys[pygame.K_4]:
+                target_index = 3
+
+            if target_index is not None and target_index < len(self.magic_list):
+                # switch selection only if allowed
+                if self.can_switch_magic and self.magic_index != target_index:
+                    self.can_switch_magic = False
+                    self.magic_switch_time = pygame.time.get_ticks()
+                    self.magic_index = target_index
+                    self.magic = self.magic_list[self.magic_index]
+
+                # cast currently selected magic
+                cfg = magic_data[self.magic]
+                self.create_magic(self.magic, cfg['strength'] * self.stats['magic_multiplier'], cfg['cost'])
+
+        # weapon switching (throttled)
+        weapon_list = list(weapon_data.keys())
+        if keys[pygame.K_q] and self.can_switch_weapon:
+            self.can_switch_weapon = False
+            self.weapon_switch_time = pygame.time.get_ticks()
+            self.weapon_index = (self.weapon_index + 1) % len(weapon_list)
+            self.weapon = weapon_list[self.weapon_index]
+
+
+        if keys[pygame.K_e] and self.can_switch_magic:
+            self.can_switch_magic = False
+            self.magic_switch_time = pygame.time.get_ticks()
+            self.magic_index = (self.magic_index + 1) % len(self.magic_list)
+            self.magic = self.magic_list[self.magic_index]
+
     def get_status(self):
         # Get the base direction (without any suffixes)
         base_direction = self.status.split('_')[0] if '_' in self.status else self.status
@@ -172,27 +221,32 @@ class Player(pygame.sprite.Sprite):
 
     def cooldowns(self):
         """Update ability cooldowns and clear active ability after effect duration"""
+        current_time = pygame.time.get_ticks()
+
         if self.active_ability:
-            current_time = pygame.time.get_ticks()
             effect_duration = 200  # 200ms effect duration
             if current_time - self.last_ability_use[self.active_ability] >= effect_duration:
                 self.active_ability = None
                 self.destroy_attack()
-
+        
+        if not self.can_switch_weapon and self.weapon_switch_time is not None:
+            if current_time - self.weapon_switch_time >= self.switch_delay:
+                self.can_switch_weapon = True
+        if not self.can_switch_magic and self.magic_switch_time is not None:
+            if current_time - self.magic_switch_time >= self.switch_delay:
+                self.can_switch_magic = True
+    
     def animate(self):
+        """Update player animation"""
         animation = self.animations[self.status]
         self.frame_index += self.animation_speed
+        
         if self.frame_index >= len(animation):
             self.frame_index = 0
         
-        #set the image to the current frame
+        # Set the image to the current frame
         self.image = animation[int(self.frame_index)]
-        self.rect = self.image.get_rect(center = self.hitbox.center)
-
-
-    def get_attack_animation(self):
-        """Get the appropriate attack animation based on current status"""
-        return self.status
+        self.rect = self.image.get_rect(center=self.hitbox.center)
     
     def update(self):
         self.input()

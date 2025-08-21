@@ -7,6 +7,7 @@ from support import *
 from random import choice
 from object_identifier import ObjectIdentifier
 from weapon import Weapon
+from ui import UI
 
 class Level:
     def __init__(self):
@@ -25,6 +26,9 @@ class Level:
 
         # Sprite creation
         self.create_map()
+
+        #user interface
+        self.ui = UI()
     
     def create_map(self):
          
@@ -76,11 +80,19 @@ class Level:
                             self.object_mapper.mark_positions_processed(positions_to_mark)
 
          # Start player near the center of the map
-         self.player = Player((0, 0), [self.visible_sprites], self.obstacle_sprites, self.create_attack, self.destroy_attack)
+         self.player = Player(
+            (0, 0),
+            [self.visible_sprites],
+            self.obstacle_sprites,
+            self.create_attack,
+            self.destroy_attack,
+            self.create_magic)
 
     def create_attack(self):
         self.current_attack = Weapon(self.player,[self.visible_sprites])
     
+    def create_magic(self,style,strength,cost):
+        print(style,strength,cost)    
     def destroy_attack(self):
         if self.current_attack:
             self.current_attack.kill()
@@ -90,8 +102,7 @@ class Level:
        # Update and draw the game
        self.visible_sprites.custom_draw(self.player)
        self.visible_sprites.update()
-       debug(self.player.status)
-       
+       self.ui.display(self.player)
        # Basic debug info
        #debug(f"Player pos: ({int(self.player.rect.centerx)}, {int(self.player.rect.centery)})")
        #debug(f"Obstacles: {len(self.obstacle_sprites)}", 10, 40)
