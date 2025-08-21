@@ -17,6 +17,9 @@ class Level:
         self.visible_sprites = YSortCameraGroup()
         self.obstacle_sprites = pygame.sprite.Group()
 
+        #attack sprites
+        self.current_attack = None
+
         # Initialize object mapper
         self.object_mapper = ObjectIdentifier()
 
@@ -73,10 +76,16 @@ class Level:
                             self.object_mapper.mark_positions_processed(positions_to_mark)
 
          # Start player near the center of the map
-         self.player = Player((0, 0), [self.visible_sprites], self.obstacle_sprites, self.create_attack)
+         self.player = Player((0, 0), [self.visible_sprites], self.obstacle_sprites, self.create_attack, self.destroy_attack)
 
     def create_attack(self):
-        Weapon(self.player,[self.visible_sprites])
+        self.current_attack = Weapon(self.player,[self.visible_sprites])
+    
+    def destroy_attack(self):
+        if self.current_attack:
+            self.current_attack.kill()
+        self.current_attack = None
+
     def run(self):
        # Update and draw the game
        self.visible_sprites.custom_draw(self.player)

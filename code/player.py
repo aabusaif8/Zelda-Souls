@@ -3,7 +3,7 @@ from settings import *
 from support import import_folder
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, groups, obstacle_sprites, create_attack):
+    def __init__(self, pos, groups, obstacle_sprites, create_attack, destroy_attack):
         
         super().__init__(groups)
         self.image = pygame.image.load('./graphics/player.png').convert_alpha()
@@ -21,7 +21,13 @@ class Player(pygame.sprite.Sprite):
         self.direction = pygame.math.Vector2()
         self.speed = 5
         self.obstacle_sprites = obstacle_sprites
+        
+
+        #weapons
         self.create_attack = create_attack
+        self.destroy_attack = destroy_attack
+        self.weapon_index = 0
+        self.weapon = list(weapon_data.keys())[self.weapon_index]
         
         # Simplified ability cooldowns
         self.ability_cooldowns = {
@@ -171,6 +177,7 @@ class Player(pygame.sprite.Sprite):
             effect_duration = 200  # 200ms effect duration
             if current_time - self.last_ability_use[self.active_ability] >= effect_duration:
                 self.active_ability = None
+                self.destroy_attack()
 
     def animate(self):
         animation = self.animations[self.status]
