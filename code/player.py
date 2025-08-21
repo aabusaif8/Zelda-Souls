@@ -1,8 +1,10 @@
 import pygame
 from settings import *
 from support import import_folder
+from enemy import Enemy
+from entity import Entity
 
-class Player(pygame.sprite.Sprite):
+class Player(Entity):
     def __init__(self, pos, groups, obstacle_sprites, create_attack, destroy_attack, create_magic):
         
         super().__init__(groups)
@@ -14,11 +16,9 @@ class Player(pygame.sprite.Sprite):
         # Graphics setup
         self.import_player_assets()
         self.status = 'down'
-        self.frame_index = 0
-        self.animation_speed = 0.15
+
 
         # Movement
-        self.direction = pygame.math.Vector2()
         self.obstacle_sprites = obstacle_sprites
         
 
@@ -39,6 +39,12 @@ class Player(pygame.sprite.Sprite):
         self.can_switch_magic = True
         self.magic_switch_time = None
         self.switch_delay = 200
+        # magic cast cooldowns (ms): make heal ~4x longer
+        self.magic_cooldowns = {
+            'flame': 10000,
+            'heal': 20000,
+        }
+        self.last_magic_cast = {name: 0 for name in self.magic_list}
 
         #stats
         self.stats = {'health': 100, 'energy': 60, 'attack': 10, 'magic_multiplier': 3, 'speed': 5}
@@ -72,6 +78,23 @@ class Player(pygame.sprite.Sprite):
             full_path = character_path + animation
             self.animations[animation] = import_folder(full_path)
     
+    def get_remaining_cooldown(self, ability_name):
+        """Get remaining cooldown time for an ability or magic"""
+        current_time = pygame.time.get_ticks()
+
+        # check ability cooldowns
+        if ability_name in self.ability_cooldowns:
+            elapsed = current_time - self.last_ability_use[ability_name]
+            return max(0, self.ability_cooldowns[ability_name] - elapsed)
+
+        # check magic cooldowns
+        if ability_name in self.magic_cooldowns:
+            elapsed = current_time - self.last_magic_cast[ability_name]
+            return max(0, self.magic_cooldowns[ability_name] - elapsed)
+
+        return 0
+
+    
     def can_use_ability(self, ability_name):
         """Check if an ability is off cooldown"""
         current_time = pygame.time.get_ticks()
@@ -89,11 +112,6 @@ class Player(pygame.sprite.Sprite):
             print(f'{ability_name} on cooldown for {remaining}ms more')
             return False
 
-    def get_remaining_cooldown(self, ability_name):
-        """Get remaining cooldown time for an ability"""
-        current_time = pygame.time.get_ticks()
-        elapsed = current_time - self.last_ability_use[ability_name]
-        return max(0, self.ability_cooldowns[ability_name] - elapsed)
 
     def input(self):
         keys = pygame.key.get_pressed()
@@ -141,9 +159,14 @@ class Player(pygame.sprite.Sprite):
                     self.magic_index = target_index
                     self.magic = self.magic_list[self.magic_index]
 
-                # cast currently selected magic
-                cfg = magic_data[self.magic]
-                self.create_magic(self.magic, cfg['strength'] * self.stats['magic_multiplier'], cfg['cost'])
+                # cast currently selected magic respecting per-spell cooldowns
+                now = pygame.time.get_ticks()
+                spell = self.magic
+                cooldown = self.magic_cooldowns.get(spell, 1000)
+                if now - self.last_magic_cast[spell] >= cooldown:
+                    cfg = magic_data[spell]
+                    self.create_magic(spell, cfg['strength'] * self.stats['magic_multiplier'], cfg['cost'])
+                    self.last_magic_cast[spell] = now
 
         # weapon switching (throttled)
         weapon_list = list(weapon_data.keys())
@@ -154,11 +177,11 @@ class Player(pygame.sprite.Sprite):
             self.weapon = weapon_list[self.weapon_index]
 
 
-        if keys[pygame.K_e] and self.can_switch_magic:
-            self.can_switch_magic = False
-            self.magic_switch_time = pygame.time.get_ticks()
-            self.magic_index = (self.magic_index + 1) % len(self.magic_list)
-            self.magic = self.magic_list[self.magic_index]
+        if keys[pygame.K_e] and self.can_switch_weapon:
+            self.can_switch_weapon = False
+            self.weapon_switch_time = pygame.time.get_ticks()
+            self.weapon_index = (self.weapon_index - 1) % len(weapon_list)
+            self.weapon = weapon_list[self.weapon_index]
 
     def get_status(self):
         # Get the base direction (without any suffixes)
@@ -177,32 +200,6 @@ class Player(pygame.sprite.Sprite):
             # If moving, set to base direction (no suffix)
             self.status = base_direction
 
-    def move(self, speed):
-        if self.direction.magnitude() != 0:
-            self.direction = self.direction.normalize()
-
-        self.hitbox.x += self.direction.x * speed
-        self.collision('horizontal')
-        self.hitbox.y += self.direction.y * speed
-        self.collision('vertical')  
-        self.rect.center = self.hitbox.center
-        
-    def collision(self, direction):        
-        if direction == 'horizontal':
-            for sprite in self.obstacle_sprites:
-                if sprite.hitbox.colliderect(self.hitbox):
-                    if self.direction.x > 0: # Moving right
-                        self.hitbox.right = sprite.hitbox.left
-                    if self.direction.x < 0: # Moving left
-                        self.hitbox.left = sprite.hitbox.right
-                        
-        if direction == 'vertical':
-            for sprite in self.obstacle_sprites:
-                if sprite.hitbox.colliderect(self.hitbox):
-                    if self.direction.y > 0: # Moving down
-                        self.hitbox.bottom = sprite.hitbox.top
-                    if self.direction.y < 0: # Moving up
-                        self.hitbox.top = sprite.hitbox.bottom
 
     def debug_draw(self, surface, offset):
         """Draw debug information"""

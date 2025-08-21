@@ -62,23 +62,43 @@ class UI:
 
         self.display_surface.blit(weapon_surf, weapon_rect)
     
-    def magic_overlay(self, magic_index, has_switched):
-        # selection box for magic (shifted right to add spacing)
-        bg_rect = self.selection_box(120, 630, has_switched)
-        # load magic icon from settings
-        magic_name = list(magic_data.keys())[magic_index]
+    def magic_overlay(self, player):
+        """Draw a single magic box that shows the last cast spell"""
+        left = 120   # x position for the magic box
+        top = 630    # y position for the magic box
+
+        # selection box for magic
+        bg_rect = self.selection_box(left, top, not player.can_switch_magic)
+
+        # which spell to show? → the last one the player selected
+        magic_name = player.magic
+
+        # load magic icon
         magic_path = magic_data[magic_name]['graphic']
         magic_surf = pygame.image.load(magic_path).convert_alpha()
         magic_rect = magic_surf.get_rect(center=bg_rect.center)
         self.display_surface.blit(magic_surf, magic_rect)
+
+        # cooldown overlay
+        remaining = player.get_remaining_cooldown(magic_name)
+        if remaining > 0:
+            overlay = pygame.Surface((ITEM_BOX_SIZE, ITEM_BOX_SIZE))
+            overlay.fill((0, 0, 0))
+            overlay.set_alpha(200)
+            self.display_surface.blit(overlay, bg_rect.topleft)
+
+            seconds = round(remaining / 1000, 1)
+            text_surf = self.font.render(str(seconds), True, TEXT_COLOR)
+            text_rect = text_surf.get_rect(center=bg_rect.center)
+            self.display_surface.blit(text_surf, text_rect)
+
+
+
     
     def display(self, player):
-        # health and energy bars
         self.show_bar(player.health,player.stats['health'],self.health_bar_rect,HEALTH_COLOR)
         self.show_bar(player.energy,player.stats['energy'],self.energy_bar_rect,ENERGY_COLOR)
         self.show_exp(player.exp)
 
-        self.show_exp(player.exp)
-        # highlight in gold when you can't switch (cooldown active)
         self.weapon_overlay(player.weapon_index, not player.can_switch_weapon)
-        self.magic_overlay(player.magic_index, not player.can_switch_magic)
+        self.magic_overlay(player)   # show only one magic box now

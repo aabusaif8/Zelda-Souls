@@ -7,7 +7,7 @@ class Game:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        pygame.display.set_caption('Zelda Souls')
+        pygame.display.set_caption('Everdusk')
         self.clock = pygame.time.Clock()
         self.level = Level()
     

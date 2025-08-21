@@ -3,20 +3,50 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "TileSet/map in progress.tmx",
+    "activeFile": "C:/Users/aabus/Documents/Pygame/graphics/TileMap/mappington.tmx",
     "expandedProjectPaths": [
-        "TileSet",
-        "."
+        ".",
+        "TileSet"
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
+        "C:/Users/aabus/Documents/Pygame/graphics/TileMap/Floor.tsx": {
+            "scaleInDock": 0.5,
+            "scaleInEditor": 1
+        },
+        "C:/Users/aabus/Documents/Pygame/graphics/TileMap/details.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "C:/Users/aabus/Documents/Pygame/graphics/TileMap/mappington.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 1447.3333333333335,
+                "y": 266.6666666666667
+            }
+        },
+        "C:/Users/aabus/Documents/Pygame/graphics/TileMap/spritesheet (3).tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "C:/Users/aabus/Downloads/Atlas/0.tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "C:/Users/aabus/Downloads/Atlas/Floor.tsx": {
+            "scaleInDock": 0.25,
+            "scaleInEditor": 1
+        },
+        "C:/Users/aabus/Downloads/Atlas/TX Plant.tsx": {
+            "scaleInDock": 1
+        },
         "C:/Users/aabus/Downloads/Atlas/TX Player.tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 1
+        },
+        "C:/Users/aabus/Downloads/Atlas/TX Props.tsx": {
+            "scaleInDock": 1
         },
         "C:/Users/aabus/Downloads/Atlas/TX Shadow.tsx": {
             "scaleInDock": 1,
@@ -30,6 +60,9 @@
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "C:/Users/aabus/Downloads/Atlas/details.tsx": {
+            "scaleInDock": 1
+        },
         "C:/Users/aabus/Downloads/Atlas/spritesheet (1).tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 1
@@ -37,6 +70,9 @@
         "C:/Users/aabus/Downloads/Atlas/spritesheet (2).tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 1
+        },
+        "C:/Users/aabus/Downloads/Atlas/spritesheet (3).tsx": {
+            "scaleInDock": 1
         },
         "C:/Users/aabus/Downloads/Atlas/spritesheet.tsx": {
             "scaleInDock": 1,
@@ -85,36 +121,37 @@
     },
     "last.exportedFilePath": "C:/Users/aabus/Documents/Pygame/graphics/TileMap",
     "last.externalTilesetPath": "C:/Users/aabus/Documents/Pygame/map/TileSet",
-    "last.imagePath": "C:/Users/aabus/Downloads",
+    "last.imagePath": "C:/Users/aabus/Documents/Pygame/graphics/TileMap",
     "map.fixedSize": true,
     "map.height": 64,
     "map.lastUsedExportFilter": "CSV files (*.csv)",
     "map.lastUsedFormat": "tmx",
     "map.width": 64,
     "openFiles": [
-        "TileSet/map in progress.tmx",
-        "TileSet/Floor.tsx",
-        "TileSet/details.tsx",
-        "TileSet/tree-trunk-32x32.tsx",
-        "TileSet/terrain_atlas.tsx"
+        "C:/Users/aabus/Documents/Pygame/graphics/TileMap/mappington.tmx",
+        "C:/Users/aabus/Documents/Pygame/graphics/TileMap/Floor.tsx",
+        "C:/Users/aabus/Documents/Pygame/graphics/TileMap/spritesheet (3).tsx",
+        "C:/Users/aabus/Documents/Pygame/graphics/TileMap/details.tsx"
     ],
     "project": "untitled.tiled-project",
     "recentFiles": [
+        "C:/Users/aabus/Documents/Pygame/graphics/TileMap/Floor.tsx",
+        "C:/Users/aabus/Documents/Pygame/graphics/TileMap/details.tsx",
+        "C:/Users/aabus/Documents/Pygame/graphics/TileMap/spritesheet (3).tsx",
+        "C:/Users/aabus/Documents/Pygame/graphics/TileMap/mappington.tmx",
+        "C:/Users/aabus/Downloads/Atlas/Floor.tsx",
         "C:/Users/aabus/Downloads/Atlas/spritesheet.tsx",
         "C:/Users/aabus/Downloads/Atlas/spritesheet (2).tsx",
         "C:/Users/aabus/Downloads/Atlas/spritesheet (1).tsx",
         "C:/Users/aabus/Downloads/Atlas/0.tsx",
         "C:/Users/aabus/Downloads/Atlas/TX Tileset Grass.tsx",
         "C:/Users/aabus/Downloads/Atlas/Tileset Stone Ground.tsx",
-        "C:/Users/aabus/Downloads/Atlas/TX Player.tsx",
-        "C:/Users/aabus/Downloads/Atlas/TX Shadow.tsx",
-        "TileSet/terrain_atlas.tsx",
-        "TileSet/tree-trunk-32x32.tsx",
-        "TileSet/details.tsx",
-        "TileSet/Floor.tsx"
+        "C:/Users/aabus/Downloads/Atlas/TX Player.tsx"
     ],
     "tileset.lastUsedFilter": "Tiled tileset files (*.tsx *.xml)",
     "tileset.lastUsedFormat": "tsx",
+    "tileset.margin": 0,
+    "tileset.spacing": 0,
     "tileset.tileSize": {
         "height": 64,
         "width": 64
